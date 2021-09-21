@@ -28,7 +28,7 @@ type SSMParameterReadWriter interface {
 func NewSSMParameterReadWriter() (SSMParameterReadWriter, error) {
 	return &ssmParamReader{
 		ssmSvc:    ssm.New(session.Must(session.NewSession())),
-		encrypted: false,
+		encrypted: true,
 	}, nil
 }
 
