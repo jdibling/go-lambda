@@ -1,4 +1,4 @@
-package lambda
+package golambda
 
 import (
 	"context"
