@@ -74,7 +74,11 @@ func (r APIGatewayProxyRequest) MapBodyStrings() (map[string]string, error) {
 
 func (r APIGatewayProxyRequest) MapBodyObjects() (map[string]interface{}, error) {
 	bodyMap := map[string]interface{}{}
-	err := json.Unmarshal([]byte(r.Body()), &bodyMap)
+	body, err := r.GetBody()
+	if err != nil {
+		return nil, fmt.Errorf("getting body; %w", err)
+	}
+	err = json.Unmarshal([]byte(body), &bodyMap)
 	if err != nil {
 		return nil, fmt.Errorf("unmarshal failed; %w", err)
 	}
@@ -83,7 +87,11 @@ func (r APIGatewayProxyRequest) MapBodyObjects() (map[string]interface{}, error)
 }
 
 func (r APIGatewayProxyRequest) ParseBody(v interface{}) error {
-	err := json.Unmarshal([]byte(r.Body()), v)
+	body, err := r.GetBody()
+	if err != nil {
+		return fmt.Errorf("getting body; %w", err)
+	}
+	err = json.Unmarshal([]byte(body), v)
 	if err != nil {
 		return fmt.Errorf("body parse failed; %w", err)
 	}
