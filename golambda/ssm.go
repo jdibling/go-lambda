@@ -3,6 +3,7 @@ package golambda
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -45,11 +46,19 @@ type ssmParam struct {
 }
 
 func (r *ssmParamReader) ReadStringWithContext(ctx context.Context, name string) (string, error) {
+	// make sure name isn't empty
+	if len(name) <= 1 {
+		return "", fmt.Errorf("getting parameter; invalid name")
+	}
+	// append leading / if not present (otherwise we will get permission denied error)
+	if !strings.HasPrefix(name, "/") {
+		name = fmt.Sprintf("/%s", name)
+	}
+	// read parameter
 	p := ssmParam{
 		name:      name,
 		encrypted: r.encrypted,
 	}
-
 	get, err := r.ssmSvc.GetParameterWithContext(ctx, &ssm.GetParameterInput{
 		Name:           aws.String(p.name),
 		WithDecryption: aws.Bool(p.encrypted),
